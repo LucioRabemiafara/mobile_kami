@@ -34,8 +34,10 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     on<TodayAttendanceRequested>(_onTodayAttendanceRequested);
     on<CheckInUnlockRequested>(_onCheckInUnlockRequested);
     on<CheckInQRScanned>(_onCheckInQRScanned);
+    on<CheckInPINSubmitted>(_onCheckInPINSubmitted);
     on<CheckOutUnlockRequested>(_onCheckOutUnlockRequested);
     on<CheckOutQRScanned>(_onCheckOutQRScanned);
+    on<CheckOutPINSubmitted>(_onCheckOutPINSubmitted);
     on<AttendanceReset>(_onAttendanceReset);
   }
 
@@ -96,6 +98,15 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     CheckInQRScanned event,
     Emitter<AttendanceState> emit,
   ) async {
+    // QR scanned successfully, ready for PIN entry
+    emit(CheckInQRScannedSuccess(event.qrCode));
+  }
+
+  /// Handle check-in PIN submission
+  Future<void> _onCheckInPINSubmitted(
+    CheckInPINSubmitted event,
+    Emitter<AttendanceState> emit,
+  ) async {
     emit(const CheckInVerifying());
 
     final authState = _authBloc.state;
@@ -106,11 +117,11 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
 
     final userId = authState.user.id;
 
-    // CRITICAL: pinCode sent to backend (using '0000' as placeholder for device-unlocked check-in)
+    // Send check-in with actual PIN code
     final result = await _checkInUseCase(
       userId: userId,
       qrCode: event.qrCode,
-      pinCode: '0000', // Placeholder when device unlock is used
+      pinCode: event.pinCode,
       checkInTime: DateTime.now(),
       location: null, // Optional: could be obtained from GPS if needed
     );
@@ -155,6 +166,15 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     CheckOutQRScanned event,
     Emitter<AttendanceState> emit,
   ) async {
+    // QR scanned successfully, ready for PIN entry
+    emit(CheckOutQRScannedSuccess(event.qrCode));
+  }
+
+  /// Handle check-out PIN submission
+  Future<void> _onCheckOutPINSubmitted(
+    CheckOutPINSubmitted event,
+    Emitter<AttendanceState> emit,
+  ) async {
     emit(const CheckOutVerifying());
 
     final authState = _authBloc.state;
@@ -165,11 +185,11 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
 
     final userId = authState.user.id;
 
-    // CRITICAL: pinCode sent to backend (using '0000' as placeholder for device-unlocked check-out)
+    // Send check-out with actual PIN code
     final result = await _checkOutUseCase(
       userId: userId,
       qrCode: event.qrCode,
-      pinCode: '0000', // Placeholder when device unlock is used
+      pinCode: event.pinCode,
       checkOutTime: DateTime.now(),
       location: null, // Optional: could be obtained from GPS if needed
     );
@@ -202,8 +222,16 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
       return 'Pas de connexion internet. Veuillez vérifier votre connexion.';
     } else if (failure is UnauthorizedFailure) {
       return 'Session expirée. Veuillez vous reconnecter.';
+    } else if (failure is InvalidPinFailure) {
+      return failure.message;
+    } else if (failure is AccountLockedFailure) {
+      return failure.message;
+    } else if (failure is TimeoutFailure) {
+      return 'La requête a expiré. Veuillez réessayer.';
+    } else if (failure is GenericFailure) {
+      return failure.message;
     } else {
-      return 'Une erreur inattendue s\'est produite.';
+      return 'Une erreur inattendue s\'est produite. Veuillez réessayer.';
     }
   }
 }

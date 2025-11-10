@@ -41,6 +41,22 @@ class CheckInQRScanned extends AttendanceEvent {
   List<Object?> get props => [qrCode];
 }
 
+/// Event to submit PIN for check-in
+///
+/// After QR scan, submit PIN to complete check-in
+class CheckInPINSubmitted extends AttendanceEvent {
+  final String qrCode;
+  final String pinCode;
+
+  const CheckInPINSubmitted({
+    required this.qrCode,
+    required this.pinCode,
+  });
+
+  @override
+  List<Object?> get props => [qrCode, pinCode];
+}
+
 /// Event to initiate device unlock for check-out
 ///
 /// Starts the device unlock process before check-out
@@ -58,6 +74,22 @@ class CheckOutQRScanned extends AttendanceEvent {
 
   @override
   List<Object?> get props => [qrCode];
+}
+
+/// Event to submit PIN for check-out
+///
+/// After QR scan, submit PIN to complete check-out
+class CheckOutPINSubmitted extends AttendanceEvent {
+  final String qrCode;
+  final String pinCode;
+
+  const CheckOutPINSubmitted({
+    required this.qrCode,
+    required this.pinCode,
+  });
+
+  @override
+  List<Object?> get props => [qrCode, pinCode];
 }
 
 /// Event to reset attendance state

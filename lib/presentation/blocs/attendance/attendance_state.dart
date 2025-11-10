@@ -62,6 +62,16 @@ class CheckInUnlockFailure extends AttendanceState {
   List<Object?> get props => [message];
 }
 
+/// Check-in QR code scanned, ready for PIN entry
+class CheckInQRScannedSuccess extends AttendanceState {
+  final String qrCode;
+
+  const CheckInQRScannedSuccess(this.qrCode);
+
+  @override
+  List<Object?> get props => [qrCode];
+}
+
 /// Check-in QR code being verified
 class CheckInVerifying extends AttendanceState {
   const CheckInVerifying();
@@ -95,6 +105,16 @@ class CheckOutUnlockFailure extends AttendanceState {
 
   @override
   List<Object?> get props => [message];
+}
+
+/// Check-out QR code scanned, ready for PIN entry
+class CheckOutQRScannedSuccess extends AttendanceState {
+  final String qrCode;
+
+  const CheckOutQRScannedSuccess(this.qrCode);
+
+  @override
+  List<Object?> get props => [qrCode];
 }
 
 /// Check-out QR code being verified

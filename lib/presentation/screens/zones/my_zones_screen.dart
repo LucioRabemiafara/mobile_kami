@@ -224,21 +224,25 @@ class _MyZonesScreenState extends State<MyZonesScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedSecurityLevel,
+                    isExpanded: true,
                     decoration: const InputDecoration(
-                      labelText: 'Niveau de sécurité',
-                      prefixIcon: Icon(Icons.security),
+                      labelText: 'Sécurité',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      isDense: true,
                     ),
                     items: [
                       const DropdownMenuItem<String>(
                         value: null,
-                        child: Text('Tous'),
+                        child: Text('Tous', overflow: TextOverflow.ellipsis),
                       ),
                       ..._securityLevels.map((level) {
                         return DropdownMenuItem<String>(
                           value: level,
-                          child: Text(_getSecurityLevelLabel(level)),
+                          child: Text(
+                            _getSecurityLevelLabel(level),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         );
                       }),
                     ],
@@ -250,25 +254,29 @@ class _MyZonesScreenState extends State<MyZonesScreen> {
                     },
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedBuilding,
+                    isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Bâtiment',
-                      prefixIcon: Icon(Icons.business),
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      isDense: true,
                     ),
                     items: [
                       const DropdownMenuItem<String>(
                         value: null,
-                        child: Text('Tous'),
+                        child: Text('Tous', overflow: TextOverflow.ellipsis),
                       ),
                       ..._buildings.map((building) {
                         return DropdownMenuItem<String>(
                           value: building,
-                          child: Text(building),
+                          child: Text(
+                            building,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         );
                       }),
                     ],
@@ -367,26 +375,32 @@ class _MyZonesScreenState extends State<MyZonesScreen> {
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: securityColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: securityColor.withOpacity(0.3),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
                       ),
-                    ),
-                    child: Text(
-                      securityLabel,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: securityColor,
+                      decoration: BoxDecoration(
+                        color: securityColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: securityColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Text(
+                        securityLabel,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: securityColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   ),

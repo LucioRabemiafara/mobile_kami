@@ -7,6 +7,7 @@ import '../../blocs/attendance/attendance_bloc.dart';
 import '../../blocs/attendance/attendance_event.dart';
 import '../../blocs/attendance/attendance_state.dart';
 import '../../widgets/common/app_dialogs.dart';
+import 'attendance_pin_entry_screen.dart';
 
 /// Attendance QR Scanner Screen
 ///
@@ -83,26 +84,33 @@ class _AttendanceQRScannerScreenState extends State<AttendanceQRScannerScreen> {
     return Scaffold(
       body: BlocConsumer<AttendanceBloc, AttendanceState>(
         listener: (context, state) {
-          if (state is CheckInVerifying) {
-            // Show loading dialog during check-in verification
-            AppDialogs.showLoading(
-              context: context,
-              message: 'Vérification du pointage d\'entrée...',
+          if (state is CheckInQRScannedSuccess) {
+            // QR scanned successfully, navigate to PIN entry
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<AttendanceBloc>(),
+                  child: AttendancePinEntryScreen(
+                    qrCode: state.qrCode,
+                    isCheckIn: true,
+                  ),
+                ),
+              ),
             );
-          } else if (state is CheckOutVerifying) {
-            // Show loading dialog during check-out verification
-            AppDialogs.showLoading(
-              context: context,
-              message: 'Vérification du pointage de sortie...',
+          } else if (state is CheckOutQRScannedSuccess) {
+            // QR scanned successfully, navigate to PIN entry
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<AttendanceBloc>(),
+                  child: AttendancePinEntryScreen(
+                    qrCode: state.qrCode,
+                    isCheckIn: false,
+                  ),
+                ),
+              ),
             );
-          } else if (state is CheckInSuccess || state is CheckOutSuccess) {
-            // Close loading dialog
-            AppDialogs.hide(context);
-            // Pop back to attendance screen
-            Navigator.of(context).pop();
           } else if (state is AttendanceError) {
-            // Close loading dialog
-            AppDialogs.hide(context);
             // Show error dialog
             AppDialogs.showError(
               context: context,
