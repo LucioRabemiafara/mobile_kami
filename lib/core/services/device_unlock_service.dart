@@ -64,7 +64,7 @@ class DeviceUnlockService {
   ///
   /// Parameters:
   /// - [localizedReason]: Message shown to the user during authentication
-  /// - [useErrorDialogs]: Show system error dialogs (default: true)
+  /// - [useErrorDialogs]: Show system error dialogs (default: false)
   /// - [stickyAuth]: Keep auth dialog visible if app goes to background (default: true)
   ///
   /// Returns:
@@ -75,7 +75,7 @@ class DeviceUnlockService {
   /// - DeviceUnlockException: If an error occurs during authentication
   Future<bool> authenticate({
     String localizedReason = 'Déverrouillez votre téléphone pour continuer',
-    bool useErrorDialogs = true,
+    bool useErrorDialogs = false,
     bool stickyAuth = true,
   }) async {
     try {
@@ -88,6 +88,9 @@ class DeviceUnlockService {
         );
       }
 
+      print('🔓 Starting device authentication...');
+      print('📱 Localized reason: $localizedReason');
+
       // ⭐ CRITICAL: biometricOnly = FALSE
       // This allows ALL unlock methods (not just biometrics):
       // - Fingerprint
@@ -97,22 +100,46 @@ class DeviceUnlockService {
       // - Password
       final authenticated = await _localAuth.authenticate(
         localizedReason: localizedReason,
-        options: const AuthenticationOptions(
+        options: AuthenticationOptions(
           biometricOnly: false, // ⭐ ACCEPT ALL UNLOCK METHODS
-          stickyAuth: true, // Keep auth dialog visible if app goes to background
-          useErrorDialogs: true, // Show system error dialogs
+          stickyAuth: stickyAuth, // Keep auth dialog visible if app goes to background
+          useErrorDialogs: useErrorDialogs, // Use the parameter value
         ),
       );
 
+      print('✅ Authentication result: $authenticated');
       return authenticated;
     } on DeviceUnlockException {
       // Re-throw our custom exception
+      print('🔴 DeviceUnlockException caught and re-thrown');
       rethrow;
     } catch (e) {
+      print('🔴 Authentication exception caught: $e');
+      print('🔴 Exception type: ${e.runtimeType}');
+
+      // Check for FragmentActivity error (Android configuration issue)
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('no_fragment_activity') ||
+          errorString.contains('fragmentactivity')) {
+        print('⚠️ FragmentActivity error - MainActivity needs to extend FlutterFragmentActivity');
+        // Return false instead of throwing - allows app to continue
+        return false;
+      }
+
+      // Check if it's a cancellation (user pressed back/cancel)
+      if (errorString.contains('cancel') ||
+          errorString.contains('user') ||
+          errorString.contains('lockauthfailed') ||
+          errorString.contains('authenticationfailed')) {
+        // User cancelled - return false instead of throwing
+        print('ℹ️ User cancelled authentication');
+        return false;
+      }
+
       // Wrap other exceptions in DeviceUnlockException
       throw DeviceUnlockException(
-        reason: 'Authentication failed',
-        message: 'Échec du déverrouillage de l\'appareil',
+        reason: 'Authentication failed: ${e.toString()}',
+        message: 'Échec du déverrouillage de l\'appareil. Veuillez réessayer.',
         details: e,
       );
     }

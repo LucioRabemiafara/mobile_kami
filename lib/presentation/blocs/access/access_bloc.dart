@@ -3,6 +3,7 @@ import '../../../core/errors/failures.dart';
 import '../../../core/services/device_unlock_service.dart';
 import '../../../domain/usecases/access/verify_access_usecase.dart';
 import '../../../domain/usecases/access/verify_pin_usecase.dart';
+import '../../../domain/usecases/access/get_access_history_usecase.dart';
 import '../auth/auth_bloc.dart';
 import '../auth/auth_state.dart';
 import 'access_event.dart';
@@ -15,16 +16,19 @@ import 'access_state.dart';
 class AccessBloc extends Bloc<AccessEvent, AccessState> {
   final VerifyAccessUseCase _verifyAccessUseCase;
   final VerifyPinUseCase _verifyPinUseCase;
+  final GetAccessHistoryUseCase _getAccessHistoryUseCase;
   final DeviceUnlockService _deviceUnlockService;
   final AuthBloc _authBloc;
 
   AccessBloc({
     required VerifyAccessUseCase verifyAccessUseCase,
     required VerifyPinUseCase verifyPinUseCase,
+    required GetAccessHistoryUseCase getAccessHistoryUseCase,
     required DeviceUnlockService deviceUnlockService,
     required AuthBloc authBloc,
   })  : _verifyAccessUseCase = verifyAccessUseCase,
         _verifyPinUseCase = verifyPinUseCase,
+        _getAccessHistoryUseCase = getAccessHistoryUseCase,
         _deviceUnlockService = deviceUnlockService,
         _authBloc = authBloc,
         super(const AccessInitial()) {
@@ -33,6 +37,7 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
     on<QRCodeScanned>(_onQRCodeScanned);
     on<PINSubmitted>(_onPINSubmitted);
     on<AccessReset>(_onAccessReset);
+    on<AccessHistoryRequested>(_onAccessHistoryRequested);
   }
 
   /// Handle Device Unlock Requested Event
@@ -82,7 +87,7 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
       // (fingerprint, face, pattern, PIN, password)
       final isAuthenticated = await _deviceUnlockService.authenticate(
         localizedReason: 'Déverrouillez votre appareil pour scanner le QR code',
-        useErrorDialogs: true,
+        useErrorDialogs: false,
         stickyAuth: true,
       );
 
@@ -92,8 +97,9 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
       } else {
         print('❌ Déverrouillage échoué ou annulé');
         emit(const DeviceUnlockFailed(
-          'Déverrouillage annulé.\n\n'
-          'Veuillez réessayer et compléter le déverrouillage de votre appareil.',
+          'Déverrouillage annulé ou impossible.\n\n'
+          'Note: Si vous voyez constamment cette erreur, le déverrouillage peut nécessiter une configuration Android spéciale.\n\n'
+          'Vous pouvez continuer sans déverrouillage, mais la sécurité sera réduite.',
         ));
       }
     } catch (e) {
@@ -104,7 +110,11 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
       // Analyse de l'erreur pour donner un message plus précis
       final errorString = e.toString().toLowerCase();
 
-      if (errorString.contains('no hardware') || errorString.contains('not available')) {
+      if (errorString.contains('no_fragment_activity') || errorString.contains('fragmentactivity')) {
+        errorMessage += 'Configuration Android requise.\n\n'
+                       'Le déverrouillage natif nécessite une configuration spéciale dans le code Android.\n\n'
+                       'Vous pouvez continuer sans cette étape, mais la sécurité sera réduite.';
+      } else if (errorString.contains('no hardware') || errorString.contains('not available')) {
         errorMessage += 'Votre appareil ne dispose pas de capteur biométrique.\n'
                        'Assurez-vous d\'avoir configuré un code PIN, schéma ou mot de passe.';
       } else if (errorString.contains('not enrolled') || errorString.contains('no fingerprints')) {
@@ -273,6 +283,42 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
     Emitter<AccessState> emit,
   ) async {
     emit(const AccessInitial());
+  }
+
+  /// Handle Access History Requested Event
+  ///
+  /// Fetches user's access history with optional date filters
+  Future<void> _onAccessHistoryRequested(
+    AccessHistoryRequested event,
+    Emitter<AccessState> emit,
+  ) async {
+    emit(const AccessHistoryLoading());
+
+    // Get current user from AuthBloc
+    final authState = _authBloc.state;
+    if (authState is! AuthAuthenticated) {
+      emit(const AccessHistoryError('Utilisateur non authentifié'));
+      return;
+    }
+
+    final userId = authState.user.id;
+
+    // Call get access history use case
+    final result = await _getAccessHistoryUseCase(
+      userId: userId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+    );
+
+    result.fold(
+      (failure) {
+        final errorMessage = _mapFailureToMessage(failure);
+        emit(AccessHistoryError(errorMessage));
+      },
+      (events) {
+        emit(AccessHistoryLoaded(events));
+      },
+    );
   }
 
   /// Map Failure to User-Friendly Message

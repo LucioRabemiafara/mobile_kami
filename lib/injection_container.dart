@@ -324,6 +324,7 @@ Future<void> configureDependencies() async {
     () => AccessBloc(
       verifyAccessUseCase: getIt<VerifyAccessUseCase>(),
       verifyPinUseCase: getIt<VerifyPinUseCase>(),
+      getAccessHistoryUseCase: getIt<GetAccessHistoryUseCase>(),
       deviceUnlockService: getIt<DeviceUnlockService>(),
       authBloc: getIt<AuthBloc>(),
     ),

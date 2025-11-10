@@ -51,3 +51,19 @@ class PINSubmitted extends AccessEvent {
 class AccessReset extends AccessEvent {
   const AccessReset();
 }
+
+/// Access History Requested Event
+///
+/// Dispatched when user requests to see their access history
+class AccessHistoryRequested extends AccessEvent {
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  const AccessHistoryRequested({
+    this.startDate,
+    this.endDate,
+  });
+
+  @override
+  List<Object?> get props => [startDate, endDate];
+}

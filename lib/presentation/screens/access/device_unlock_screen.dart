@@ -132,14 +132,56 @@ class _DeviceUnlockViewState extends State<_DeviceUnlockView> with SingleTickerP
             );
           } else if (state is DeviceUnlockFailed) {
             AppDialogs.hide(context);
-            AppDialogs.showError(
+            // Show error dialog with Skip option
+            showDialog(
               context: context,
-              title: 'Échec du Déverrouillage',
-              message: state.message,
-              buttonText: 'Réessayer',
-              onConfirm: () {
-                context.read<AccessBloc>().add(const DeviceUnlockRequested());
-              },
+              barrierDismissible: false,
+              builder: (dialogContext) => AlertDialog(
+                title: const Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                    SizedBox(width: 12),
+                    Text('Échec du Déverrouillage'),
+                  ],
+                ),
+                content: Text(state.message),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.of(dialogContext).pop();
+                      // Skip unlock and go directly to QR scanner
+                      final permissionService = CameraPermissionService();
+                      final hasPermission = await permissionService.ensureCameraPermission();
+
+                      if (hasPermission && context.mounted) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider.value(
+                              value: context.read<AccessBloc>(),
+                              child: const QRScannerScreen(),
+                            ),
+                          ),
+                        );
+                      } else if (context.mounted) {
+                        AppDialogs.showError(
+                          context: context,
+                          title: 'Permission Requise',
+                          message: 'L\'accès à la caméra est nécessaire pour scanner le QR code.',
+                          buttonText: 'OK',
+                        );
+                      }
+                    },
+                    child: const Text('Ignorer et continuer'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      context.read<AccessBloc>().add(const DeviceUnlockRequested());
+                    },
+                    child: const Text('Réessayer'),
+                  ),
+                ],
+              ),
             );
           }
         },

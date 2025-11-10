@@ -8,12 +8,15 @@ import '../../blocs/auth/auth_state.dart';
 import '../../blocs/dashboard/dashboard_bloc.dart';
 import '../../blocs/dashboard/dashboard_event.dart';
 import '../../blocs/dashboard/dashboard_state.dart';
+import '../../blocs/access/access_bloc.dart';
+import '../../../injection_container.dart';
 import '../../widgets/dashboard/kpi_card.dart';
 import '../access/device_unlock_screen.dart';
 import '../attendance/attendance_screen.dart';
 import '../zones/my_zones_screen.dart';
 import '../profile/profile_screen.dart';
 import '../access_requests/my_access_requests_screen.dart';
+import '../history/access_history_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 /// Dashboard Screen
@@ -745,10 +748,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
             break;
           case 3:
-            // Historique
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Écran Historique disponible prochainement'),
+            // Historique - Navigate to Access History Screen
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => BlocProvider<AccessBloc>(
+                  create: (_) => getIt<AccessBloc>(),
+                  child: const AccessHistoryScreen(),
+                ),
               ),
             );
             break;

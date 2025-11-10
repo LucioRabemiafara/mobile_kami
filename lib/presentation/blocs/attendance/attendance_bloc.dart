@@ -71,24 +71,32 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   ) async {
     emit(const CheckInUnlockInProgress());
 
-    final canCheck = await _deviceUnlockService.canCheckDeviceUnlock();
-    if (!canCheck) {
-      emit(const CheckInUnlockFailure(
-        'Le déverrouillage de l\'appareil n\'est pas disponible sur cet appareil',
-      ));
-      return;
-    }
+    try {
+      final canCheck = await _deviceUnlockService.canCheckDeviceUnlock();
+      if (!canCheck) {
+        emit(const CheckInUnlockFailure(
+          'Le déverrouillage de l\'appareil n\'est pas disponible sur cet appareil',
+        ));
+        return;
+      }
 
-    // CRITICAL: biometricOnly: false accepts ALL methods
-    final isAuthenticated = await _deviceUnlockService.authenticate(
-      localizedReason: 'Déverrouillez votre appareil pour pointer',
-    );
+      // CRITICAL: biometricOnly: false accepts ALL methods
+      final isAuthenticated = await _deviceUnlockService.authenticate(
+        localizedReason: 'Déverrouillez votre appareil pour pointer l\'entrée',
+        useErrorDialogs: false,
+      );
 
-    if (isAuthenticated) {
-      emit(const CheckInUnlockSuccess());
-    } else {
-      emit(const CheckInUnlockFailure(
-        'Déverrouillage annulé ou échoué',
+      if (isAuthenticated) {
+        emit(const CheckInUnlockSuccess());
+      } else {
+        emit(const CheckInUnlockFailure(
+          'Déverrouillage annulé. Veuillez réessayer.',
+        ));
+      }
+    } catch (e) {
+      print('🔴 Error during check-in unlock: $e');
+      emit(CheckInUnlockFailure(
+        'Erreur lors du déverrouillage: ${e.toString()}',
       ));
     }
   }
@@ -139,24 +147,32 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   ) async {
     emit(const CheckOutUnlockInProgress());
 
-    final canCheck = await _deviceUnlockService.canCheckDeviceUnlock();
-    if (!canCheck) {
-      emit(const CheckOutUnlockFailure(
-        'Le déverrouillage de l\'appareil n\'est pas disponible sur cet appareil',
-      ));
-      return;
-    }
+    try {
+      final canCheck = await _deviceUnlockService.canCheckDeviceUnlock();
+      if (!canCheck) {
+        emit(const CheckOutUnlockFailure(
+          'Le déverrouillage de l\'appareil n\'est pas disponible sur cet appareil',
+        ));
+        return;
+      }
 
-    // CRITICAL: biometricOnly: false accepts ALL methods
-    final isAuthenticated = await _deviceUnlockService.authenticate(
-      localizedReason: 'Déverrouillez votre appareil pour pointer',
-    );
+      // CRITICAL: biometricOnly: false accepts ALL methods
+      final isAuthenticated = await _deviceUnlockService.authenticate(
+        localizedReason: 'Déverrouillez votre appareil pour pointer la sortie',
+        useErrorDialogs: false,
+      );
 
-    if (isAuthenticated) {
-      emit(const CheckOutUnlockSuccess());
-    } else {
-      emit(const CheckOutUnlockFailure(
-        'Déverrouillage annulé ou échoué',
+      if (isAuthenticated) {
+        emit(const CheckOutUnlockSuccess());
+      } else {
+        emit(const CheckOutUnlockFailure(
+          'Déverrouillage annulé. Veuillez réessayer.',
+        ));
+      }
+    } catch (e) {
+      print('🔴 Error during check-out unlock: $e');
+      emit(CheckOutUnlockFailure(
+        'Erreur lors du déverrouillage: ${e.toString()}',
       ));
     }
   }

@@ -40,8 +40,8 @@ class AttendanceModel {
 
   factory AttendanceModel.fromJson(Map<String, dynamic> json) {
     return AttendanceModel(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
+      id: json['id'].toString(),
+      userId: json['userId'].toString(),
       date: DateTime.parse(json['date'] as String),
       checkIn: json['checkIn'] != null ? DateTime.parse(json['checkIn'] as String) : null,
       checkOut: json['checkOut'] != null ? DateTime.parse(json['checkOut'] as String) : null,

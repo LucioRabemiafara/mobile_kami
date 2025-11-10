@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../data/models/access_event_model.dart';
 
 /// Access States
 ///
@@ -132,6 +133,37 @@ class AccessError extends AccessState {
   final String message;
 
   const AccessError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+/// Access History Loading State
+///
+/// History is being loaded from the server
+class AccessHistoryLoading extends AccessState {
+  const AccessHistoryLoading();
+}
+
+/// Access History Loaded State
+///
+/// History has been successfully loaded
+class AccessHistoryLoaded extends AccessState {
+  final List<AccessEventModel> events;
+
+  const AccessHistoryLoaded(this.events);
+
+  @override
+  List<Object?> get props => [events];
+}
+
+/// Access History Error State
+///
+/// An error occurred while loading history
+class AccessHistoryError extends AccessState {
+  final String message;
+
+  const AccessHistoryError(this.message);
 
   @override
   List<Object?> get props => [message];

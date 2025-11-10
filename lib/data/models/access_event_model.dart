@@ -23,6 +23,8 @@ class AccessEventModel {
   // Optional fields
   final String? zoneName;
   final String? userEmail;
+  final String? userFullName;
+  final String? ipAddress;
 
   const AccessEventModel({
     required this.id,
@@ -35,13 +37,15 @@ class AccessEventModel {
     this.deviceUnlocked = false,
     this.zoneName,
     this.userEmail,
+    this.userFullName,
+    this.ipAddress,
   });
 
   factory AccessEventModel.fromJson(Map<String, dynamic> json) {
     return AccessEventModel(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
-      zoneId: json['zoneId'] as String,
+      id: json['id'].toString(),
+      userId: json['userId'].toString(),
+      zoneId: json['zoneId'].toString(),
       timestamp: DateTime.parse(json['timestamp'] as String),
       status: json['status'] as String,
       method: json['method'] as String,
@@ -49,6 +53,8 @@ class AccessEventModel {
       deviceUnlocked: json['deviceUnlocked'] as bool? ?? false,
       zoneName: json['zoneName'] as String?,
       userEmail: json['userEmail'] as String?,
+      userFullName: json['userFullName'] as String?,
+      ipAddress: json['ipAddress'] as String?,
     );
   }
 
@@ -64,6 +70,8 @@ class AccessEventModel {
       'deviceUnlocked': deviceUnlocked,
       if (zoneName != null) 'zoneName': zoneName,
       if (userEmail != null) 'userEmail': userEmail,
+      if (userFullName != null) 'userFullName': userFullName,
+      if (ipAddress != null) 'ipAddress': ipAddress,
     };
   }
 
@@ -78,6 +86,8 @@ class AccessEventModel {
     bool? deviceUnlocked,
     String? zoneName,
     String? userEmail,
+    String? userFullName,
+    String? ipAddress,
   }) {
     return AccessEventModel(
       id: id ?? this.id,
@@ -90,6 +100,8 @@ class AccessEventModel {
       deviceUnlocked: deviceUnlocked ?? this.deviceUnlocked,
       zoneName: zoneName ?? this.zoneName,
       userEmail: userEmail ?? this.userEmail,
+      userFullName: userFullName ?? this.userFullName,
+      ipAddress: ipAddress ?? this.ipAddress,
     );
   }
 
@@ -107,7 +119,9 @@ class AccessEventModel {
         other.reason == reason &&
         other.deviceUnlocked == deviceUnlocked &&
         other.zoneName == zoneName &&
-        other.userEmail == userEmail;
+        other.userEmail == userEmail &&
+        other.userFullName == userFullName &&
+        other.ipAddress == ipAddress;
   }
 
   @override
@@ -121,11 +135,13 @@ class AccessEventModel {
         reason.hashCode ^
         deviceUnlocked.hashCode ^
         zoneName.hashCode ^
-        userEmail.hashCode;
+        userEmail.hashCode ^
+        userFullName.hashCode ^
+        ipAddress.hashCode;
   }
 
   @override
   String toString() {
-    return 'AccessEventModel(id: $id, userId: $userId, zoneId: $zoneId, timestamp: $timestamp, status: $status, method: $method, reason: $reason, deviceUnlocked: $deviceUnlocked, zoneName: $zoneName, userEmail: $userEmail)';
+    return 'AccessEventModel(id: $id, userId: $userId, zoneId: $zoneId, timestamp: $timestamp, status: $status, method: $method, reason: $reason, deviceUnlocked: $deviceUnlocked, zoneName: $zoneName, userEmail: $userEmail, userFullName: $userFullName, ipAddress: $ipAddress)';
   }
 }
