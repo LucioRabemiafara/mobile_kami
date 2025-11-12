@@ -41,14 +41,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _loadDashboardData() {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
-      context.read<DashboardBloc>().add(const DashboardDataRequested());
+      context.read<DashboardBloc>().add(
+        DashboardDataRequested(userId: authState.user.id),
+      );
     }
   }
 
   Future<void> _onRefresh() async {
     final authState = context.read<AuthBloc>().state;
     if (authState is AuthAuthenticated) {
-      context.read<DashboardBloc>().add(const DashboardRefreshRequested());
+      context.read<DashboardBloc>().add(
+        DashboardRefreshRequested(userId: authState.user.id),
+      );
     }
   }
 

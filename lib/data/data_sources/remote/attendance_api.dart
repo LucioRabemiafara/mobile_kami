@@ -4,6 +4,7 @@ import '../../../core/api/api_endpoints.dart';
 import '../../../core/api/dio_client.dart';
 import '../../../core/errors/exceptions.dart';
 import '../../models/attendance_model.dart';
+import '../../models/attendance_stats_model.dart';
 import 'api_error_handler.dart';
 
 /// Attendance API Interface
@@ -40,6 +41,14 @@ abstract class AttendanceApi {
     required int userId,
     DateTime? startDate,
     DateTime? endDate,
+  });
+
+  /// Get monthly attendance statistics
+  /// API Doc: GET /api/attendance/stats?userId={id}&month={month}&year={year}
+  Future<AttendanceStatsModel> getAttendanceStats({
+    required int userId,
+    int? month,
+    int? year,
   });
 }
 
@@ -170,6 +179,39 @@ class AttendanceApiImpl implements AttendanceApi {
       return data
           .map((json) => AttendanceModel.fromJson(json as Map<String, dynamic>))
           .toList();
+    } on DioException catch (e) {
+      throw ApiErrorHandler.handleDioException(e);
+    }
+  }
+
+  @override
+  Future<AttendanceStatsModel> getAttendanceStats({
+    required int userId,
+    int? month,
+    int? year,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{
+        'userId': userId,
+      };
+
+      if (month != null) {
+        queryParams['month'] = month;
+      }
+      if (year != null) {
+        queryParams['year'] = year;
+      }
+
+      final response = await _dioClient.get(
+        ApiEndpoints.attendanceStats,
+        queryParameters: queryParams,
+      );
+
+      // Format de réponse: { success, message, data: {...}, errors, timestamp }
+      final responseData = response.data as Map<String, dynamic>;
+      final data = responseData['data'] as Map<String, dynamic>;
+
+      return AttendanceStatsModel.fromJson(data);
     } on DioException catch (e) {
       throw ApiErrorHandler.handleDioException(e);
     }

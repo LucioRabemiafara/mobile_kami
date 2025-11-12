@@ -46,6 +46,7 @@ import 'domain/usecases/attendance/check_in_usecase.dart';
 import 'domain/usecases/attendance/check_out_usecase.dart';
 import 'domain/usecases/attendance/get_today_attendance_usecase.dart';
 import 'domain/usecases/attendance/get_attendance_history_usecase.dart';
+import 'domain/usecases/attendance/get_attendance_stats_usecase.dart';
 
 // UseCases - User
 import 'domain/usecases/user/get_user_usecase.dart';
@@ -275,6 +276,10 @@ Future<void> configureDependencies() async {
     () => GetAttendanceHistoryUseCase(getIt<AttendanceRepository>()),
   );
 
+  getIt.registerLazySingleton<GetAttendanceStatsUseCase>(
+    () => GetAttendanceStatsUseCase(getIt<AttendanceRepository>()),
+  );
+
   // User UseCases
   getIt.registerLazySingleton<GetUserUseCase>(
     () => GetUserUseCase(getIt<UserRepository>()),
@@ -333,7 +338,11 @@ Future<void> configureDependencies() async {
   // DashboardBloc
   getIt.registerFactory<DashboardBloc>(
     () => DashboardBloc(
-      getKpisUseCase: getIt<GetKpisUseCase>(),
+      getAttendanceStatsUseCase: getIt<GetAttendanceStatsUseCase>(),
+      getTodayAttendanceUseCase: getIt<GetTodayAttendanceUseCase>(),
+      getAttendanceHistoryUseCase: getIt<GetAttendanceHistoryUseCase>(),
+      getAccessZonesUseCase: getIt<GetAccessZonesUseCase>(),
+      getAccessHistoryUseCase: getIt<GetAccessHistoryUseCase>(),
     ),
   );
 

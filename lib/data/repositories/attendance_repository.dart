@@ -4,6 +4,7 @@ import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../data_sources/remote/attendance_api.dart';
 import '../models/attendance_model.dart';
+import '../models/attendance_stats_model.dart';
 
 /// Attendance Repository Interface
 abstract class AttendanceRepository {
@@ -35,6 +36,13 @@ abstract class AttendanceRepository {
     required int userId,
     DateTime? startDate,
     DateTime? endDate,
+  });
+
+  /// Get monthly attendance statistics
+  Future<Either<Failure, AttendanceStatsModel>> getAttendanceStats({
+    required int userId,
+    int? month,
+    int? year,
   });
 }
 
@@ -162,6 +170,33 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       );
 
       return Right(attendances);
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    } on TimeoutException catch (e) {
+      return Left(TimeoutFailure(message: e.message));
+    } catch (e) {
+      return Left(GenericFailure(message: 'Une erreur inattendue est survenue: ${e.toString()}'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AttendanceStatsModel>> getAttendanceStats({
+    required int userId,
+    int? month,
+    int? year,
+  }) async {
+    try {
+      final stats = await _attendanceApi.getAttendanceStats(
+        userId: userId,
+        month: month,
+        year: year,
+      );
+
+      return Right(stats);
     } on UnauthorizedException catch (e) {
       return Left(UnauthorizedFailure(message: e.message));
     } on NetworkException catch (e) {

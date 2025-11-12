@@ -12,14 +12,24 @@ abstract class DashboardEvent extends Equatable {
 
 /// Event to request dashboard data
 ///
-/// Fetches KPIs and stats for the authenticated user (from JWT token)
+/// Fetches KPIs and stats for the authenticated user
 class DashboardDataRequested extends DashboardEvent {
-  const DashboardDataRequested();
+  final int userId;
+
+  const DashboardDataRequested({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 /// Event to refresh dashboard data
 ///
 /// Used for pull-to-refresh functionality
 class DashboardRefreshRequested extends DashboardEvent {
-  const DashboardRefreshRequested();
+  final int userId;
+
+  const DashboardRefreshRequested({required this.userId});
+
+  @override
+  List<Object?> get props => [userId];
 }

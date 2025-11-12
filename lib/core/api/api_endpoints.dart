@@ -66,6 +66,11 @@ class ApiEndpoints {
   /// Response: [{ date, checkIn, checkOut, hoursWorked, isLate }]
   static const String attendanceHistory = baseUrl + AppConstants.attendanceHistoryEndpoint; //'/attendance/history';
 
+  /// GET /attendance/stats?userId={id}&month={month}&year={year}
+  /// Headers: Authorization Bearer {accessToken}
+  /// Response: { totalDaysWorked, totalHoursWorked, averageHoursPerDay, totalLateArrivals }
+  static const String attendanceStats = baseUrl + '/attendance/stats';
+
   // ========== USERS ==========
 
   /// GET /users/{id}
