@@ -281,12 +281,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ];
 
         // Utiliser GridView pour un meilleur contrôle des espacements
-        // childAspectRatio = largeur / hauteur (plus petit = plus haut)
+        // childAspectRatio = largeur / hauteur (plus petit = plus haut, plus grand = plus compact)
         final childAspectRatio = crossAxisCount == 4
-            ? 0.85  // Pour 4 colonnes (très grand écran)
+            ? 1.2  // Pour 4 colonnes (très grand écran)
             : crossAxisCount == 3
-                ? 0.80  // Pour 3 colonnes (tablette)
-                : 0.75;  // Pour 2 colonnes (téléphone)
+                ? 1.1  // Pour 3 colonnes (tablette)
+                : 1.05;  // Pour 2 colonnes (téléphone)
 
         return GridView.builder(
           shrinkWrap: true,

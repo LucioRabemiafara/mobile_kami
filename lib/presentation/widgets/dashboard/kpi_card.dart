@@ -26,13 +26,13 @@ class KpiCard extends StatelessWidget {
     final isSmallScreen = screenWidth < 360;
 
     // Adapter les tailles selon la taille de l'écran
-    final iconContainerSize = isSmallScreen ? 40.0 : 48.0;
-    final iconSize = isSmallScreen ? 20.0 : 24.0;
-    final titleFontSize = isSmallScreen ? 11.0 : 13.0;
-    final valueFontSize = isSmallScreen ? 20.0 : 24.0;
-    final subtitleFontSize = isSmallScreen ? 9.0 : 11.0;
-    final padding = isSmallScreen ? 12.0 : 16.0;
-    final spacing = isSmallScreen ? 8.0 : 12.0;
+    final iconContainerSize = isSmallScreen ? 36.0 : 42.0;
+    final iconSize = isSmallScreen ? 18.0 : 22.0;
+    final titleFontSize = isSmallScreen ? 11.0 : 12.0;
+    final valueFontSize = isSmallScreen ? 20.0 : 22.0;
+    final subtitleFontSize = isSmallScreen ? 9.0 : 10.0;
+    final padding = isSmallScreen ? 10.0 : 12.0;
+    final spacing = isSmallScreen ? 6.0 : 8.0;
 
     return Card(
       elevation: 2,
@@ -54,7 +54,7 @@ class KpiCard extends StatelessWidget {
         ),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Icon
               Container(
@@ -74,18 +74,20 @@ class KpiCard extends StatelessWidget {
               SizedBox(height: spacing),
 
               // Title
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: titleFontSize,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
+              Flexible(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
 
               // Value
               Text(
@@ -99,21 +101,22 @@ class KpiCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
 
-              // Spacer pour pousser le subtitle vers le bas
-              const Spacer(),
-
               // Subtitle (optional)
-              if (subtitle != null)
-                Text(
-                  subtitle!,
-                  style: TextStyle(
-                    fontSize: subtitleFontSize,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Flexible(
+                  child: Text(
+                    subtitle!,
+                    style: TextStyle(
+                      fontSize: subtitleFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
+              ],
             ],
         ),
       ),
