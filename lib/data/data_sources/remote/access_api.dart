@@ -62,12 +62,25 @@ class AccessApiImpl implements AccessApi {
       );
 
       // Format de réponse: { success, message, data: {...}, errors, timestamp }
-      final responseData = response.data as Map<String, dynamic>;
-      final data = responseData['data'] as Map<String, dynamic>;
+      print('🔍 [AccessAPI] Raw response: ${response.data}');
+      print('🔍 [AccessAPI] Response type: ${response.data.runtimeType}');
 
-      return AccessVerifyResponseModel.fromJson(data);
+      final responseData = response.data as Map<String, dynamic>;
+      print('🔍 [AccessAPI] ResponseData keys: ${responseData.keys}');
+      print('🔍 [AccessAPI] ResponseData: $responseData');
+
+      final data = responseData['data'] as Map<String, dynamic>;
+      print('🔍 [AccessAPI] Data: $data');
+
+      final model = AccessVerifyResponseModel.fromJson(data);
+      print('✅ [AccessAPI] Model parsed: ${model.toString()}');
+      return model;
     } on DioException catch (e) {
       throw ApiErrorHandler.handleDioException(e);
+    } catch (e, stackTrace) {
+      print('❌ [AccessAPI] Unexpected error: $e');
+      print('❌ [AccessAPI] StackTrace: $stackTrace');
+      rethrow;
     }
   }
 

@@ -46,6 +46,7 @@ class AccessRepositoryImpl implements AccessRepository {
     String? ipAddress,
   }) async {
     try {
+      print('🔄 [AccessRepository] Calling API with userId: $userId, qrCode: $qrCode');
       final response = await _accessApi.verifyAccess(
         userId: userId,
         qrCode: qrCode,
@@ -53,23 +54,33 @@ class AccessRepositoryImpl implements AccessRepository {
         ipAddress: ipAddress,
       );
 
+      print('✅ [AccessRepository] API success, returning Right(response)');
+      print('✅ [AccessRepository] Response: ${response.toString()}');
       return Right(response);
     } on UnauthorizedException catch (e) {
+      print('❌ [AccessRepository] UnauthorizedException: ${e.message}');
       return Left(UnauthorizedFailure(message: e.message));
     } on NetworkException catch (e) {
+      print('❌ [AccessRepository] NetworkException: ${e.message}');
       return Left(NetworkFailure(message: e.message));
     } on ServerException catch (e) {
+      print('❌ [AccessRepository] ServerException: ${e.message}');
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on QRCodeException catch (e) {
+      print('❌ [AccessRepository] QRCodeException: ${e.message}');
       return Left(QRCodeFailure(message: e.message));
     } on AccountLockedException catch (e) {
+      print('❌ [AccessRepository] AccountLockedException: ${e.message}');
       return Left(AccountLockedFailure(
         message: e.message,
         lockedUntil: e.lockedUntil,
       ));
     } on TimeoutException catch (e) {
+      print('❌ [AccessRepository] TimeoutException: ${e.message}');
       return Left(TimeoutFailure(message: e.message));
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('❌ [AccessRepository] Unexpected exception: $e');
+      print('❌ [AccessRepository] StackTrace: $stackTrace');
       return Left(GenericFailure(message: 'Une erreur inattendue est survenue: ${e.toString()}'));
     }
   }

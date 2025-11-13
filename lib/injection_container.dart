@@ -93,7 +93,7 @@ Future<void> configureDependencies() async {
         BaseOptions(
           baseUrl: ApiEndpoints.baseUrl,
           connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(minutes: 2), // ⭐ Augmenté temporairement
           sendTimeout: const Duration(seconds: 30),
           headers: {
             'Content-Type': 'application/json',
