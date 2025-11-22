@@ -51,6 +51,9 @@ class AccessApiImpl implements AccessApi {
     String? ipAddress,
   }) async {
     try {
+      print('⏱️ [AccessAPI] Starting verifyAccess request...');
+      final requestStart = DateTime.now();
+
       final response = await _dioClient.post(
         ApiEndpoints.verifyAccess,
         data: {
@@ -59,7 +62,13 @@ class AccessApiImpl implements AccessApi {
           if (deviceInfo != null) 'deviceInfo': deviceInfo,
           if (ipAddress != null) 'ipAddress': ipAddress,
         },
+        options: Options(
+          receiveTimeout: const Duration(minutes: 3), // ⭐ Timeout spécifique pour cette requête
+        ),
       );
+
+      final requestDuration = DateTime.now().difference(requestStart);
+      print('⏱️ [AccessAPI] Request completed in ${requestDuration.inMilliseconds}ms');
 
       // Format de réponse: { success, message, data: {...}, errors, timestamp }
       print('🔍 [AccessAPI] Raw response: ${response.data}');

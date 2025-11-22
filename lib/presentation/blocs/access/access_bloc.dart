@@ -191,6 +191,7 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
           // Access granted for LOW/MEDIUM security zones
           emit(AccessGranted(zoneName));
         } else if (response.status == 'PENDING_PIN') {
+          print('🔐 Access PENDING_PIN (eventId: ${response.eventId})');
           // High security zone requires PIN
           // eventId is now returned instead of tempToken
           final eventId = response.eventId ?? 0;
@@ -204,11 +205,14 @@ class AccessBloc extends Bloc<AccessEvent, AccessState> {
           ));
         } else if (response.status == 'DENIED') {
           // Access denied
+          print('❌ Access DENIED');
+          print('❌ Reason: ${response.reason}');
           emit(AccessDenied(
             zoneName: zoneName,
             reason: response.reason ?? 'Accès non autorisé',
           ));
         } else {
+          print('⚠️ Unknown status: ${response.status}');
           emit(const AccessError('Réponse inattendue du serveur'));
         }
       },

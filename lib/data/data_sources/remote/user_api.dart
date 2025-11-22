@@ -42,19 +42,31 @@ class UserApiImpl implements UserApi {
   @override
   Future<List<ZoneModel>> getAccessZones(int userId) async {
     try {
-      final response = await _dioClient.get(
-        '${ApiEndpoints.getUser}/$userId${ApiEndpoints.getUserAccessZones}',
-      );
+      print('🔍 [UserAPI] Fetching access zones for userId: $userId');
+      final url = '${ApiEndpoints.getUser}/$userId${ApiEndpoints.getUserAccessZones}';
+      print('🔍 [UserAPI] URL: $url');
+
+      final response = await _dioClient.get(url);
 
       // Format de réponse: { success, message, data: [...], errors, timestamp }
+      print('🔍 [UserAPI] Raw response: ${response.data}');
       final responseData = response.data as Map<String, dynamic>;
       final List<dynamic> data = responseData['data'] as List<dynamic>;
+      print('✅ [UserAPI] Zones count: ${data.length}');
 
-      return data
+      final zones = data
           .map((json) => ZoneModel.fromJson(json as Map<String, dynamic>))
           .toList();
+
+      print('✅ [UserAPI] Parsed zones: ${zones.map((z) => z.name).join(", ")}');
+      return zones;
     } on DioException catch (e) {
+      print('❌ [UserAPI] DioException: ${e.message}');
       throw ApiErrorHandler.handleDioException(e);
+    } catch (e, stackTrace) {
+      print('❌ [UserAPI] Unexpected error: $e');
+      print('❌ [UserAPI] StackTrace: $stackTrace');
+      rethrow;
     }
   }
 }

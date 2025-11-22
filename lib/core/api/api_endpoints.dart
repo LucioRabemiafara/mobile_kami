@@ -8,7 +8,7 @@ class ApiEndpoints {
 
   // Base URL   192.168.88.26
   //  192.168.88.28
-  static const String baseUrl = 'http://192.168.143.222:8080/api';
+  static const String baseUrl = 'http://192.168.88.28:8080/api';
 
   // ========== AUTHENTICATION ==========
 
