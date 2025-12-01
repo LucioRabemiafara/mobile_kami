@@ -255,42 +255,42 @@ class _DeviceUnlockViewState extends State<_DeviceUnlockView> with SingleTickerP
                         ),
 
                       // Skip button in dev mode (always visible)
-                      if (!hasError && AppConstants.isDevelopmentMode) ...[
-                        SizedBox(height: isVerySmallHeight ? 16 : 24),
-                        TextButton.icon(
-                          onPressed: isLoading
-                              ? null
-                              : () {
-                                  // Skip unlock in dev mode - go directly to QR scanner
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => BlocProvider.value(
-                                        value: context.read<AccessBloc>(),
-                                        child: const QRScannerScreen(),
-                                      ),
-                                    ),
-                                  );
-                                },
-                          icon: Icon(Icons.skip_next, size: isSmallScreen ? 18 : 20),
-                          label: Text(
-                            'Ignorer le déverrouillage (DEV)',
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 12 : 14,
-                            ),
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.warning,
-                          ),
-                        ),
-                        Text(
-                          '⚠️ Mode Développement Actif',
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 10 : 12,
-                            color: AppColors.warning,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ],
+                      // if (!hasError && AppConstants.isDevelopmentMode) ...[
+                      //   SizedBox(height: isVerySmallHeight ? 16 : 24),
+                      //   TextButton.icon(
+                      //     onPressed: isLoading
+                      //         ? null
+                      //         : () {
+                      //             // Skip unlock in dev mode - go directly to QR scanner
+                      //             Navigator.of(context).push(
+                      //               MaterialPageRoute(
+                      //                 builder: (_) => BlocProvider.value(
+                      //                   value: context.read<AccessBloc>(),
+                      //                   child: const QRScannerScreen(),
+                      //                 ),
+                      //               ),
+                      //             );
+                      //           },
+                      //     icon: Icon(Icons.skip_next, size: isSmallScreen ? 18 : 20),
+                      //     label: Text(
+                      //       'Ignorer le déverrouillage (DEV)',
+                      //       style: TextStyle(
+                      //         fontSize: isSmallScreen ? 12 : 14,
+                      //       ),
+                      //     ),
+                      //     style: TextButton.styleFrom(
+                      //       foregroundColor: AppColors.warning,
+                      //     ),
+                      //   ),
+                      //   Text(
+                      //     '⚠️ Mode Développement Actif',
+                      //     style: TextStyle(
+                      //       fontSize: isSmallScreen ? 10 : 12,
+                      //       color: AppColors.warning,
+                      //       fontStyle: FontStyle.italic,
+                      //     ),
+                      //   ),
+                      // ],
 
                       // Error state with retry button
                       if (hasError) ...[
